@@ -1,2 +1,4 @@
-def test_sum()
-	assert 2 + 2 == 4
+from app import greetings
+
+def test_greetings():
+	assert greet("World") == "Hello, World"
