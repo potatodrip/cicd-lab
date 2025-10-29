@@ -26,3 +26,21 @@ jobs:
       - name: Run tests
         run: |
           pytest || echo "no tests found"
+
+  docs:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate docs
+        run: |
+          mkdir -p docs
+          echo "Документация обновлена $(date)" > docs/last_update.txt
+      - name: Commit docs
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add docs/
+          git commit -m "Автообновление документации" || echo "No changes"
+          git push
+
