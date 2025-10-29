@@ -32,15 +32,20 @@ jobs:
     needs: build-and-test
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Generate docs
         run: |
           mkdir -p docs
           echo "Документация обновлена $(date)" > docs/last_update.txt
-      - name: Commit docs
+      - name: Commit and push docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git checkout ${GITHUB_REF#refs/heads/}
           git add docs/
           git commit -m "Автообновление документации" || echo "No changes"
-          git push
-
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${GITHUB_REF#refs/heads/}
